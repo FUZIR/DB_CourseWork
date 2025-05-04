@@ -1,7 +1,7 @@
 from database.database import Database
 from app.main import config
 
-class Category:
+class CategoryRepository:
     def __init__(self):
         self.db = Database(config["DB_NAME"])
 

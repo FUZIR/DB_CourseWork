@@ -1,6 +1,6 @@
 from database.database import Database
 
-class Outcome:
+class OutcomeRepository:
     def __init__(self):
         self.db = Database(config["DB_NAME"])
 

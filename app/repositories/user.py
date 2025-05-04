@@ -1,9 +1,10 @@
-from database.database import Database
-from app.main import config
 import bcrypt
 
+from database.database import Database
+from app.main import config
 
-class User:
+
+class UserRepository:
     def __init__(self):
         self.db = Database(config["DB_NAME"])
 
@@ -12,7 +13,7 @@ class User:
             f"""
             INSERT INTO USERS (login, password, name, surname) VALUES (?,?,?,?)
             """,
-            (login, bcrypt.hashpw(password.encode(), config["SALT"]).decode("utf-8"), name, surname)
+            (login, password, name, surname)
         )
         self.db.conn.commit()
         return self.db.cursor.lastrowid
