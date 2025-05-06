@@ -1,9 +1,9 @@
 from database.database import Database
-from app.main import config
+from app.config import DB_NAME
 
 class IncomeRepository:
     def __init__(self):
-        self.db = Database(config["DB_NAME"])
+        self.db = Database(DB_NAME)
 
     def create(self, user_id, category_id, amount, currency_id, description=None):
         stmt = self.db.cursor.execute(
@@ -17,9 +17,13 @@ class IncomeRepository:
 
     def get_all(self, user_id):
         stmt = self.db.cursor.execute(
-            f"""
-            SELECT * FROM Incomes WHERE user_id = ?
-            """,
+            f"""SELECT Incomes.id, Incomes.user_id, Incomes.category_id, Incomes.amount, Incomes.currency_id, Currencies.currency_name, 
+                           Incomes.date, Incomes.description, Categories.category_name
+                    FROM Incomes
+                    JOIN Categories ON Incomes.category_id = Categories.id
+                    JOIN Currencies ON Incomes.currency_id = Currencies.id
+                    WHERE Incomes.user_id = ?
+                    """,
             (user_id,)
         ).fetchall()
         return stmt
@@ -27,8 +31,13 @@ class IncomeRepository:
     def get_by_id(self, user_id, income_id):
         stmt = self.db.cursor.execute(
             f"""
-            SELECT * FROM Incomes WHERE user_id = ? AND id = ?
-            """,
+                    SELECT Incomes.id, Incomes.user_id, Incomes.category_id, Incomes.currency_id, Currencies.currency_name, 
+                           Incomes.date, Incomes.description, Categories.category_name
+                    FROM Incomes
+                    JOIN Categories ON Incomes.category_id = Categories.id
+                    JOIN Currencies ON Incomes.currency_id = Currencies.id
+                    WHERE Incomes.user_id = ? AND Incomes.id = ?
+                    """,
             (user_id, income_id)
         ).fetchone()
         return stmt

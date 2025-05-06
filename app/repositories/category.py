@@ -1,9 +1,9 @@
 from database.database import Database
-from app.main import config
+from app.config import DB_NAME
 
 class CategoryRepository:
     def __init__(self):
-        self.db = Database(config["DB_NAME"])
+        self.db = Database(DB_NAME)
 
     def create(self, category_name):
         stmt = self.db.cursor.execute(

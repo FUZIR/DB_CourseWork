@@ -1,18 +1,26 @@
 import bcrypt
 
 from database.database import Database
-from app.main import config
+from app.config import DB_NAME
 
 
 class UserRepository:
     def __init__(self):
-        self.db = Database(config["DB_NAME"])
+        self.db = Database(DB_NAME)
 
     def register(self, login: str, password: str, name:str, surname:str):
-        stmt =  self.db.cursor.execute(
+        stmt = self.db.cursor.execute(
+            "SELECT * FROM Users WHERE login = ?",
+            (login,)
+        )
+        user = stmt.fetchone()
+        if user:
+            return None
+
+        stmt = self.db.cursor.execute(
             f"""
-            INSERT INTO USERS (login, password, name, surname) VALUES (?,?,?,?)
-            """,
+                    INSERT INTO Users (login, password, name, surname) VALUES (?,?,?,?)
+                    """,
             (login, password, name, surname)
         )
         self.db.conn.commit()
@@ -20,7 +28,7 @@ class UserRepository:
 
     def login(self, login: str, password: str):
         stmt = self.db.cursor.execute(
-            "SELECT * FROM USERS WHERE login = ?",
+            "SELECT * FROM Users WHERE login = ?",
             (login,)
         )
         user = stmt.fetchone()

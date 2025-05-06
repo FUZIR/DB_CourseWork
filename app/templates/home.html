@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Головна</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="top-bar">
+        <button id="logout">Вийти</button>
+    </div>
+
+    <!-- Доходи -->
+    <div class="section">
+        <div class="list">
+            <h3>Список доходів</h3>
+            <ul style="display: flex; flex-direction: row;">
+                {% for currency, total in income_sums.items() %}
+                    <li>{{ total | round(2) }} {{ currency }}</li>
+                {% endfor %}
+            </ul>
+            <ul>
+                {% for income in incomes %}
+                    <li>
+                        <strong>Категорія:</strong> {{ income[8] }},
+                        <strong>Сума:</strong> {{ income[3] }} {{ income[5] }},
+                        <strong>Опис:</strong> {{ income[7] or "—" }}
+
+                        <form action="/income/delete/{{ income[0] }}" method="post" class="inline">
+                            <input type="hidden" name="user_id" value="{{ user_id }}">
+                            <button type="submit">Видалити</button>
+                        </form>
+
+                        <form action="/income/update/{{ income[0] }}" method="post" class="inline">
+                            <input type="hidden" name="user_id" value="{{ user_id }}">
+
+                            <select name="category_id" required>
+                                {% for category in categories %}
+                                    <option value="{{ category[0] }}" {% if category[0] == income[2] %}selected{% endif %}>{{ category[1] }}</option>
+                                {% endfor %}
+                            </select>
+
+                            <input type="number" step="0.01" name="amount" value="{{ income[3] }}" required>
+
+                            <select name="currency_id" required>
+                                {% for currency in currencies %}
+                                    <option value="{{ currency[0] }}" {% if currency[0] == income[4] %}selected{% endif %}>{{ currency[1] }}</option>
+                                {% endfor %}
+                            </select>
+
+                            <input type="text" name="description" value="{{ income[7] }}">
+                            <button type="submit">Оновити</button>
+                        </form>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="form">
+            <h3>Додати дохід</h3>
+            <form action="/income/create" method="post">
+                <input type="hidden" name="user_id" value="{{ user_id }}">
+
+                <select name="category_id" required>
+                    {% for category in categories %}
+                        <option value="{{ category[0] }}">{{ category[1] }}</option>
+                    {% endfor %}
+                </select>
+
+                <input type="number" step="0.01" name="amount" placeholder="Сума" required>
+
+                <select name="currency_id" required>
+                    {% for currency in currencies %}
+                        <option value="{{ currency[0] }}">{{ currency[1] }}</option>
+                    {% endfor %}
+                </select>
+
+                <input type="text" name="description" placeholder="Опис (необов'язково)">
+                <button type="submit">Додати</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Витрати -->
+    <div class="section">
+        <div class="list">
+            <h3>Список витрат</h3>
+            <ul style="display: flex; flex-direction: row;">
+                {% for currency, total in outcome_sums.items() %}
+                    <li>{{ total | round(2) }} {{ currency }}</li>
+                {% endfor %}
+            </ul>
+            <ul>
+                {% for outcome in outcomes %}
+                    <li>
+                        <strong>Категорія:</strong> {{ outcome[8] }},
+                        <strong>Сума:</strong> {{ outcome[3] }} {{ outcome[5] }},
+                        <strong>Дата:</strong> {{ outcome[6] }},
+                        <strong>Опис:</strong> {{ outcome[7] or "—" }}
+
+                        <form action="/outcome/delete/{{ outcome[0] }}" method="post" class="inline">
+                            <input type="hidden" name="user_id" value="{{ user_id }}">
+                            <button type="submit">Видалити</button>
+                        </form>
+
+                        <form action="/outcome/update/{{ outcome[0] }}" method="post" class="inline">
+                            <input type="hidden" name="user_id" value="{{ user_id }}">
+
+                            <select name="category_id" required>
+                                {% for category in categories %}
+                                    <option value="{{ category[0] }}" {% if category[0] == outcome[2] %}selected{% endif %}>{{ category[1] }}</option>
+                                {% endfor %}
+                            </select>
+
+                            <input type="number" step="0.01" name="amount" value="{{ outcome[3] }}" required>
+
+                            <select name="currency_id" required>
+                                {% for currency in currencies %}
+                                    <option value="{{ currency[0] }}" {% if currency[0] == outcome[4] %}selected{% endif %}>{{ currency[1] }}</option>
+                                {% endfor %}
+                            </select>
+
+                            <input type="date" name="date" value="{{ outcome[6] }}" required>
+                            <input type="text" name="description" value="{{ outcome[7] }}">
+                            <button type="submit">Оновити</button>
+                        </form>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="form">
+            <h3>Додати витрату</h3>
+            <form action="/outcome/create" method="post">
+                <input type="hidden" name="user_id" value="{{ user_id }}">
+
+                <select name="category_id" required>
+                    {% for category in categories %}
+                        <option value="{{ category[0] }}">{{ category[1] }}</option>
+                    {% endfor %}
+                </select>
+
+                <input type="number" step="0.01" name="amount" placeholder="Сума" required>
+
+                <select name="currency_id" required>
+                    {% for currency in currencies %}
+                        <option value="{{ currency[0] }}">{{ currency[1] }}</option>
+                    {% endfor %}
+                </select>
+
+                <input type="date" name="date" required>
+                <input type="text" name="description" placeholder="Опис">
+                <button type="submit">Додати</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const userId = "{{ user_id }}";
+        if (userId) {
+            localStorage.setItem('user_id', userId);
+        }
+
+        document.getElementById("logout").addEventListener("click", function() {
+            localStorage.removeItem('user_id');
+            window.location.href = "/login";
+        });
+    </script>
+</body>
+</html>
